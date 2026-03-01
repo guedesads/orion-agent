@@ -1,26 +1,46 @@
-class OrionSalesAgent:
-    def __init__(self, name):
-        self.name = name
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
 
-    def generate_strategy(self, business, audience, goal):
-        return f"""
-Você é {self.name}, um estrategista de vendas e marketing de elite.
+load_dotenv()
 
-NEGÓCIO:
-{business}
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-PÚBLICO:
-{audience}
+def gestor_trafego_agent(nicho, objetivo, orcamento):
+    prompt = f"""
+    Você é um gestor de tráfego pago sênior.
+    Analise o negócio abaixo e gere um plano de ação.
 
-OBJETIVO:
-{goal}
+    Nicho: {nicho}
+    Objetivo: {objetivo}
+    Orçamento mensal: {orcamento}
 
-Tarefas:
-1. Diagnosticar o principal gargalo de vendas
-2. Criar uma proposta clara e direta
-3. Gerar um script de abordagem para Instagram ou WhatsApp
-4. Criar uma copy curta e persuasiva
-5. Sugerir próximo passo comercial
+    Entregue:
+    1. Diagnóstico do negócio
+    2. Estratégia de tráfego recomendada
+    3. Estrutura de campanha (Meta ou Google)
+    4. Sugestão de oferta
+    5. Próximo passo prático
+    """
 
-Responda de forma prática, direta e aplicável.
-"""
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": "Você é um especialista em marketing digital e tráfego pago."},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.7
+    )
+
+    return response.choices[0].message.content
+
+
+if __name__ == "__main__":
+    print("🚀 Orion Agent - Gestor de Tráfego IA")
+    nicho = input("Nicho do negócio: ")
+    objetivo = input("Objetivo principal: ")
+    orcamento = input("Orçamento mensal (R$): ")
+
+    resultado = gestor_trafego_agent(nicho, objetivo, orcamento)
+    print("\n📊 PLANO GERADO:\n")
+    print(resultado)
